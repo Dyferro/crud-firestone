@@ -29,12 +29,16 @@ function App() {
 
 
 
-  return <div className="container mt-5">
-    <h1 className="text-center text-primary">CRUD-FIRESTONE</h1>
+  return <div className="container mt-2">
+    <div className="container bg-dark p-3 rounded">
+      <h1 className="text-center text-primary">CRUD-FIRESTONE</h1>
+    </div>
     <hr />
-    <div className="row">
+    <div className="row ">
       <div className="col-md-6">
-        <h4 className="text-center">Listar Tareas</h4>
+        <div className="container bg-secondary bg-gradient bg-opacity-75 p-2">
+          <h4 className="text-center">Listar Tareas</h4>
+        </div>
         <hr />
         <ol className="list-group list-group-flush list-group-numbered">
           {
@@ -48,27 +52,32 @@ function App() {
         </ol>
       </div>
       <div className="col-md-6">
-        <h4 className="text-center">Formulario</h4>
+        <div className="container bg-secondary bg-gradient bg-opacity-75 p-2">
+          <h4 className="text-center">Formulario</h4>
+        </div>
         <hr />
-        <form >
-          <div className="input-group mb-2">
-            <div className="mb-2">
-              <input
-                className="mt-2 form-control"
-                type="text"
-                placeholder="Nombre de la tarea"
-              />
+        <div className="container border border-dark p-6">
+          <form >
+            <div className="input-group mb-2 p-3 ">
+              <div className="mb-2">
+                <input
+                  className="mt-2 form-control"
+                  type="text"
+                  placeholder="Nombre de la tarea"
+                />
+              </div>
+              <div className="mb-2">
+                <input
+                  className="mt-2 form-control"
+                  type="text"
+                  placeholder="Cantidad de Eventos"
+                />
+              </div>
             </div>
-            <div className="mb-2">
-              <input
-                className="mt-2 form-control"
-                type="text"
-                placeholder="Cantidad de Eventos"
-              />
-            </div>
-          </div>
-          <button className="btn btn-primary">Agregar Tarea</button>
-        </form>
+            <button className="btn btn-primary mb-3">Agregar Tarea</button>
+          </form>
+        </div>
+
       </div>
     </div>
   </div>;
