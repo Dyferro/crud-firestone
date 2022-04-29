@@ -4,8 +4,11 @@ import { firebase } from "./firebase";
 function App() {
 
   const [tareas, setTareas] = React.useState([]);
+  const [id, setId] = React.useState('');
   const [tarea, setTarea] = React.useState('');
   const [cantidad, setCantidad] = React.useState('');
+  const [modoEdicion, setModoEdicion] = React.useState(false);
+  const [error, setError] = React.useState('');
 
   React.useEffect(() => {
     const obtenerDatos = async () => {
@@ -25,6 +28,7 @@ function App() {
         setTareas(arrData)
       } catch (error) {
         console.log('Error: ' + error);
+
       }
 
       //Obtener Datos con Promesa Funciona con warnings
@@ -53,11 +57,13 @@ function App() {
     //Validaciones
     if (!tarea.trim()) {
       console.log('Tarea vacia');
+      setError(error);
       return
     }
 
     if (!cantidad.trim()) {
       console.log('Cantidad vacia');
+      setError(error);
       return
     }
 
@@ -75,6 +81,7 @@ function App() {
       setCantidad('')
     } catch (error) {
       console.log(error);
+      setError(error);
     }
 
     //Agregar con Promesa funciona a palazos...revisar luego
@@ -104,6 +111,47 @@ function App() {
 
   }
 
+  const editarModo = (item) => {
+    setModoEdicion(true);
+    setTarea(item.name)
+    setId(item.id)
+    setCantidad(item.cantidad)
+    console.log(tarea + id + cantidad);
+  }
+
+  const editarTarea = async (e) => {
+    e.preventDefault()
+
+    //Validaciones
+    if (!tarea.trim()) {
+      console.log('Tarea vacia');
+      setError(error);
+      return
+    }
+
+    if (!cantidad.trim()) {
+      console.log('Cantidad vacia');
+      setError(error);
+      return
+    }
+
+    try {
+      const db = firebase.firestore();
+      await db.collection('tareas').doc(id).update({ name: tarea, cantidad: cantidad })
+      const arrayEditado = tareas.map(item => item.id === id ? { id, name: tarea, cantidad: cantidad } : item)
+      setTareas(arrayEditado)
+      setModoEdicion(false)
+      setTarea('')
+      setCantidad('')
+      setId('')
+      setError(null)
+    } catch (error) {
+      console.log(error);
+    }
+
+
+  }
+
   return <div className="container mt-2">
     <div className="container bg-dark p-3 rounded">
       <h1 className="text-center text-primary">CRUD-FIRESTONE</h1>
@@ -129,7 +177,9 @@ function App() {
                   Eliminar
                 </button>
                 <button
-                  className="btn btn-warning btn-sm float-end">
+                  className="btn btn-warning btn-sm float-end"
+                  onClick={() => editarModo(item)}
+                >
                   Editar
                 </button>
 
@@ -144,7 +194,15 @@ function App() {
         </div>
         <hr />
         <div className="container border border-dark p-6">
-          <form onSubmit={addTarea} >
+          <h5 className="text-center text-primary mt-3">
+            {
+              modoEdicion ? 'Editar Tarea' : 'Agregar Tarea'
+            }
+          </h5>
+          <form onSubmit={modoEdicion ? editarTarea : addTarea} >
+            {
+              error ? <span className="text-danger">{error}</span> : null
+            }
             <div className="input-group mb-2 p-3 ">
               <div className="mb-2">
                 <input
@@ -169,7 +227,9 @@ function App() {
               className="btn btn-primary btn-block mb-3"
               type="submit"
             >
-              Agregar Tarea
+              {
+                modoEdicion ? 'Editar Tarea' : 'Agregar Tarea'
+              }
             </button>
           </form>
         </div>
