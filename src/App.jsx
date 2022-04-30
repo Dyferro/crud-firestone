@@ -18,7 +18,6 @@ function App() {
         const db = firebase.firestore();
         //Acceder a coleccion tareas
         const data = await db.collection('tareas').get();
-        //console.log(data.docs);
         //Mapear data
         const arrData = data.docs.map(doc => ({
           id: doc.id,
@@ -36,16 +35,13 @@ function App() {
        //Acceder a coleccion tareas
        const data = await db.collection('tareas').get()
          .then(() => {
-           //console.log(data.docs);
            //Mapear data
            const arrData = data.docs.map(doc => ({
              id: doc.id,
              ...doc.data()
            }))
-           //console.log(arrData);
            setTareas(arrData)
-         })
-         .catch(error => (console.log('Error: ' + error)))*/
+         }).catch(error => (console.log(error)))*/
 
     }
     obtenerDatos();
@@ -84,30 +80,36 @@ function App() {
       setError(error);
     }
 
-    //Agregar con Promesa funciona a palazos...revisar luego
-    /*const db = firebase.firestore();
-    const nuevaTarea = { name: tarea, cantidad: cantidad };
-    const data = await db.collection('tareas').add(nuevaTarea)
-      .then(() => {
-        setTareas([
-          ...tareas,
-          { ...nuevaTarea, id: data.id }
-        ])
-        setTarea('')
-        setCantidad('')
-      })
-      .catch(error => (console.log('Error: ' + error)));*/
+    //Agregar con Promesa da problemas el data.id dentro de laa promesa...revisar luego
+    /* const db = firebase.firestore();
+     const nuevaTarea = { name: tarea, cantidad: cantidad };
+     const data = await db.collection('tareas').add(nuevaTarea).then(() => {
+       setTareas([
+         ...tareas,
+         { ...nuevaTarea, id: data.id }
+       ])
+       setTarea('')
+       setCantidad('')
+     }).catch(error => (console.log(error)));*/
   }
 
   const eliminarTarea = async (id) => {
-    try {
-      const db = firebase.firestore();
-      await db.collection('tareas').doc(id).delete() //Eliminar de la BD
+    //Eliminar tarea con Try-Catch funcionando OK
+    /* try {
+       const db = firebase.firestore();
+       await db.collection('tareas').doc(id).delete() //Eliminar de la BD
+       const arrFilter = tareas.filter(item => item.id !== id);//Actualiza mi lista de tareas
+       setTareas(arrFilter);
+     } catch (error) {
+       console.log(error);
+     }*/
+
+    //Eliminar en modo Promesa funciona OK
+    const db = firebase.firestore();
+    await db.collection('tareas').doc(id).delete().then(() => {
       const arrFilter = tareas.filter(item => item.id !== id);//Actualiza mi lista de tareas
       setTareas(arrFilter);
-    } catch (error) {
-      console.log(error);
-    }
+    }).catch(err => (console.log(err)))
 
   }
 
@@ -116,7 +118,6 @@ function App() {
     setTarea(item.name)
     setId(item.id)
     setCantidad(item.cantidad)
-    console.log(tarea + id + cantidad);
   }
 
   const editarTarea = async (e) => {
@@ -135,7 +136,8 @@ function App() {
       return
     }
 
-    try {
+    //Editar tarea con Try-catch funciona ok
+    /*try {
       const db = firebase.firestore();
       await db.collection('tareas').doc(id).update({ name: tarea, cantidad: cantidad })
       const arrayEditado = tareas.map(item => item.id === id ? { id, name: tarea, cantidad: cantidad } : item)
@@ -147,7 +149,19 @@ function App() {
       setError(null)
     } catch (error) {
       console.log(error);
-    }
+    }*/
+
+    //Editar en Promesa funcionando Ok
+    const db = firebase.firestore();
+    await db.collection('tareas').doc(id).update({ name: tarea, cantidad: cantidad }).then(() => {
+      const arrayEditado = tareas.map(item => item.id === id ? { id, name: tarea, cantidad: cantidad } : item)
+      setTareas(arrayEditado)
+      setModoEdicion(false)
+      setTarea('')
+      setCantidad('')
+      setId('')
+      setError(null)
+    }).catch(err => (console.log(error)))
 
 
   }
@@ -224,7 +238,9 @@ function App() {
               </div>
             </div>
             <button
-              className="btn btn-primary btn-block mb-3"
+              className={
+                modoEdicion ? "btn btn-warning btn-block mb-3" : "btn btn-primary btn-block mb-3"
+              }
               type="submit"
             >
               {
